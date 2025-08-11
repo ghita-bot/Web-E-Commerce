@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vegashop</title>
+    <link href="./output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .notification {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .cart-hover {
+            transform: translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        .cart-hover.show {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+        .zoom-disabled img {
+            pointer-events: none;
+            object-fit: contain;
+        }
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            background: white;
+        }
+        .product-card {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .category-btn {
+            transition: all 0.2s ease;
+        }
+        .profile-scroll {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .profile-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .profile-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .profile-scroll::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        .profile-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        .ad-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .rating-stars {
+            display: inline-flex;
+            position: relative;
+        }
+        .rating-stars .stars-empty {
+            color: #d1d5db;
+        }
+        .rating-stars .stars-filled {
+            color: #f59e0b;
+            position: absolute;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .categories-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 8px 0;
+        }
+        .categories-scroll {
+            display: flex;
+            gap: 12px;
+            padding: 8px 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .categories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+        .category-btn {
+            flex: 0 0 auto;
+            padding: 8px 20px;
+            border-radius: 9999px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .category-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.25);
+        }
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            border: 1px solid #d1d5db;
+            border-radius: 9999px;
+            overflow: hidden;
+        }
+        .quantity-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f3f4f6;
+            cursor: pointer;
+            user-select: none;
+        }
+        .quantity-input {
+            width: 40px;
+            text-align: center;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+        }
+        .ed-banner {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        .payment-method-option input:checked + div {
+            border-color: #3b82f6;
+            background-color: #f0f7ff;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        .checkout-item {
+            transition: all 0.2s ease;
+        }
+        .checkout-item:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center">
+                        <span class="font-semibold text-blue-600 text-2xl">Vega<span class="text-gray-900">Shop</span></span>
+                    </a>
+                </div> 
+                
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-md mx-8">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Search products..." 
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search absolute right-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="flex items-center space-x-6">
+                    <!-- Cart -->
+                    <div class="relative">
+                        <button id="cartBtn" class="relative p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                            <i class="fas fa-shopping-cart text-xl"></i>
+                            <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </button>
+                        
+                        <!-- Cart Hover Dropdown -->
+                        <div id="cartHover" class="cart-hover absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-xl border p-4 z-50">
+                            <h3 class="font-semibold text-lg mb-3">Shopping Cart</h3>
+                            <div id="cartItems" class="space-y-2 max-h-60 overflow-y-auto">
+                                <p class="text-gray-500 text-center py-4">Your cart is empty</p>
+                            </div>
+                            <div class="border-t pt-3 mt-3">
+                                <button id="viewCartBtn" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                    View Cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile -->
+                    <button id="profileBtn" class="p-2 text-gray-700 hover:text-blue-600 transition-colors">
+                        <i class="fas fa-user text-xl"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Categories -->
+    <section class="bg-white shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="categories-container">
+                <div class="categories-scroll">
+                    <button onclick="filterByCategory('all')" class="category-btn active">
+                        <i class="fas fa-boxes mr-2"></i> All Products
+                    </button>
+                    <button onclick="filterByCategory('Gaming')" class="category-btn">
+                        <i class="fas fa-gamepad mr-2 text-purple-600"></i> Gaming
+                    </button>
+                    <button onclick="filterByCategory('Mobile')" class="category-btn">
+                        <i class="fas fa-mobile mr-2 text-blue-300"></i> Mobile
+                    </button>
+                    <button onclick="filterByCategory('Audio')" class="category-btn">
+                        <i class="fas fa-headphones mr-2 text-green-500"></i> Audio
+                    </button>
+                    <button onclick="filterByCategory('TV')" class="category-btn">
+                        <i class="fas fa-tv mr-2 text-red-600 "></i> TV
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Promo Banner -->
+    <section class="container mx-auto px-4 py-4">
+        <div class="ad-banner p-6 flex flex-col md:flex-row items-center justify-between">
+            <div class="mb-4 md:mb-0">
+                <h2 class="text-2xl md:text-3xl font-bold mb-2">Year-End Sale!</h2>
+                <p class="text-lg md:text-xl opacity-90">Get up to 50% off on selected products</p>
+                <button class="mt-4 bg-white text-blue-600 px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                    Shop Now
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Loading -->
+        <div id="loading" class="text-center py-12">
+            <i class="fas fa-spinner fa-spin text-3xl text-blue-600"></i>
+            <p class="mt-2 text-gray-600">Loading products...</p>
+        </div>
+
+        <!-- Products Grid -->
+        <div id="productsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 hidden">
+        </div>
+
+        <!-- No Results -->
+        <div id="noResults" class="text-center py-12 hidden">
+            <i class="fas fa-search text-4xl text-gray-400 mb-4"></i>
+            <p class="text-gray-600">No products found</p>
+        </div>
+
+        <!-- Ad Banner 4 -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+            <div class="bg-gradient-to-r from-red-500 to-yellow-500 rounded-xl p-6 text-white ed-banner">
+                <div class="flex flex-col md:flex-row items-center justify-between">
+                    <div class="mb-4 md:mb-0">
+                        <h3 class="text-2xl font-bold">FLASH SALE!</h3>
+                        <p class="mt-2">Up to 70% off today only!</p>
+                        <div class="mt-2 flex items-center">
+                            <span class="font-bold mr-2">Ends in:</span>
+                            <span class="bg-white text-red-500 px-2 py-1 rounded font-bold">12:34:56</span>
+                        </div>
+                    </div>
+                    <button class="bg-white text-red-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
+                        Shop Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl w-full max-w-2xl overflow-hidden shadow-2xl">
+                <!-- Profile Header -->
+                <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold">My Profile</h2>
+                            <p class="text-blue-100">Manage your account information</p>
+                        </div>
+                        <button onclick="closeModal('profileModal')" class="text-white hover:text-blue-200 transition-colors">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Profile Content -->
+                <div class="profile-scroll space-y-6 p-6">
+                    <!-- User Avatar Section -->
+                    <div class="text-center">
+                        <div class="relative mx-auto w-32 h-32 mb-4">
+                            <div class="w-full h-full rounded-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+                                <i class="fas fa-user text-5xl text-blue-600"></i>
+                            </div>
+                            <button class="absolute bottom-0 right-0 bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center shadow-md hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-camera text-sm"></i>
+                            </button>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800" id="displayUserName">John Doe</h3>
+                        <p class="text-gray-600" id="displayUserEmail">john@example.com</p>
+                        <div class="mt-2 flex justify-center space-x-2">
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Premium Member</span>
+                            <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Verified</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Stats -->
+                    <div class="grid grid-cols-3 gap-4 text-center bg-gray-50 p-4 rounded-xl">
+                        <div>
+                            <p class="text-sm text-gray-500">Orders</p>
+                            <p class="text-lg font-bold text-blue-600">12</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Wishlist</p>
+                            <p class="text-lg font-bold text-blue-600">5</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500">Member Since</p>
+                            <p class="text-lg font-bold text-blue-600">2024</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Personal Information Section -->
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-lg text-gray-800 border-b pb-2 flex items-center">
+                            <i class="fas fa-user-circle mr-2 text-blue-600"></i>
+                            Personal Information
+                        </h4>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                                <input type="text" id="userName" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                       value="John Doe">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" id="userEmail" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                       value="john@example.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                <input type="tel" id="userPhone" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                       value="+62 812 3456 7890">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                                <input type="date" id="userBirthDate" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                                       value="1990-01-01">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                                <div class="flex space-x-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="gender" value="male" class="text-blue-600 focus:ring-blue-500" checked>
+                                        <span class="ml-2">Male</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="gender" value="female" class="text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2">Female</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="gender" value="other" class="text-blue-600 focus:ring-blue-500">
+                                        <span class="ml-2">Other</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Shipping Address Section -->
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-lg text-gray-800 border-b pb-2 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>
+                            Shipping Address
+                        </h4>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Address</label>
+                            <textarea id="userAddress" rows="3" 
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">Jl. Contoh No. 123, Jakarta</textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Province</label>
+                                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option>DKI Jakarta</option>
+                                    <option>Jawa Barat</option>
+                                    <option>Jawa Tengah</option>
+                                    <option>Jawa Timur</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option>Jakarta Selatan</option>
+                                    <option>Jakarta Pusat</option>
+                                    <option>Jakarta Barat</option>
+                                    <option>Jakarta Utara</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">District</label>
+                                <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                    <option>Kebayoran Baru</option>
+                                    <option>Setiabudi</option>
+                                    <option>Mampang</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                                <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" value="12120">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Security Section -->
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-lg text-gray-800 border-b pb-2 flex items-center">
+                            <i class="fas fa-shield-alt mr-2 text-blue-600"></i>
+                            Account Security
+                        </h4>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Change Password</label>
+                            <div class="space-y-3">
+                                <input type="password" placeholder="Current Password" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <input type="password" placeholder="New Password" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <input type="password" placeholder="Confirm New Password" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center">
+                            <input type="checkbox" id="twoFactor" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="twoFactor" class="ml-2 block text-sm text-gray-700">
+                                Enable Two-Factor Authentication
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex border-t">
+                    <button onclick="logout()" class="flex-1 py-4 text-red-600 font-medium hover:bg-red-50 transition-colors flex items-center justify-center">
+                        <i class="fas fa-sign-out-alt mr-2"></i> 
+                        <a href="index.html">Logout</a>
+                    </button>
+                    <button onclick="saveProfile()" class="flex-1 py-4 bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors flex items-center justify-center">
+                        <i class="fas fa-save mr-2"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold">Shopping Cart</h2>
+                    <button onclick="closeModal('cartModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div id="cartModalContent">
+                    <!-- Cart items will be populated here -->
+                </div>
+                
+                <div class="border-t pt-6 mt-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xl font-semibold">Total:</span>
+                        <span id="cartTotal" class="text-2xl font-bold text-blue-600">$0.00</span>
+                    </div>
+                    <button id="checkoutBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg font-semibold">
+                        Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg w-full max-w-4xl p-6 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold">Product Details</h2>
+                    <button onclick="closeModal('productModal')" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div id="productDetailContent">
+                    <!-- Product detail will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <!-- Checkout Modal -->
+<div id="checkoutModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden shadow-2xl">
+            <!-- Checkout Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold">Checkout</h2>
+                        <p class="text-blue-100">Complete your purchase</p>
+                    </div>
+                    <button onclick="closeModal('checkoutModal')" class="text-white hover:text-blue-200 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Checkout Content -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <div id="checkoutContent" class="space-y-6">
+                    <!-- Order Summary Section -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <h3 class="font-bold text-lg mb-3 flex items-center">
+                            <i class="fas fa-receipt mr-2 text-blue-600"></i>
+                            Order Summary
+                        </h3>
+                        <div id="checkoutItems" class="space-y-3 max-h-60 overflow-y-auto">
+                            <!-- Items will be dynamically inserted here -->
+                        </div>
+                        <div class="border-t pt-3 mt-3 space-y-2">
+                            <div class="flex justify-between">
+                                <span>Subtotal:</span>
+                                <span id="checkoutSubtotal" class="font-semibold">$0.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Shipping:</span>
+                                <span id="checkoutShipping" class="font-semibold">$5.99</span>
+                            </div>
+                            <div class="flex justify-between text-lg font-bold">
+                                <span>Total Payment:</span>
+                                <span id="checkoutTotal" class="text-blue-600">$5.99</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delivery Options Section -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <h3 class="font-bold text-lg mb-3 flex items-center">
+                            <i class="fas fa-truck mr-2 text-blue-600"></i>
+                            Delivery Options
+                        </h3>
+                        <div class="space-y-2">
+                            <div class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-white transition-colors">
+                                <input type="radio" name="delivery" value="standard" checked 
+                                    onchange="updateDeliveryCost('standard', 5.99)" 
+                                    class="h-5 w-5 text-blue-600 focus:ring-blue-500">
+                                <div class="ml-3 flex-1">
+                                    <div class="flex justify-between">
+                                        <span class="font-medium">Standard Delivery</span>
+                                        <span class="font-semibold">$5.99</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600">3-5 business days</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-white transition-colors">
+                                <input type="radio" name="delivery" value="express" 
+                                    onchange="updateDeliveryCost('express', 12.99)" 
+                                    class="h-5 w-5 text-blue-600 focus:ring-blue-500">
+                                <div class="ml-3 flex-1">
+                                    <div class="flex justify-between">
+                                        <span class="font-medium">Express Delivery</span>
+                                        <span class="font-semibold">$12.99</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600">1-2 business days</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-white transition-colors">
+                                <input type="radio" name="delivery" value="next-day" 
+                                    onchange="updateDeliveryCost('next-day', 19.99)" 
+                                    class="h-5 w-5 text-blue-600 focus:ring-blue-500">
+                                <div class="ml-3 flex-1">
+                                    <div class="flex justify-between">
+                                        <span class="font-medium">Next Day Delivery</span>
+                                        <span class="font-semibold">$19.99</span>
+                                    </div>
+                                    <p class="text-sm text-gray-600">Next business day</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Section -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <h3 class="font-bold text-lg mb-3 flex items-center">
+                            <i class="fas fa-credit-card mr-2 text-blue-600"></i>
+                            Payment Method
+                        </h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="payment-method-option">
+                                <input type="radio" name="payment" value="transfer" checked class="hidden">
+                                <div class="p-3 border rounded-lg flex items-center hover:border-blue-500 transition-colors">
+                                    <i class="fas fa-university text-xl text-blue-600 mr-3"></i>
+                                    <span>Bank Transfer</span>
+                                </div>
+                            </label>
+                            <label class="payment-method-option">
+                                <input type="radio" name="payment" value="ewallet" class="hidden">
+                                <div class="p-3 border rounded-lg flex items-center hover:border-blue-500 transition-colors">
+                                    <i class="fas fa-wallet text-xl text-green-600 mr-3"></i>
+                                    <span>E-Wallet</span>
+                                </div>
+                            </label>
+                            <label class="payment-method-option">
+                                <input type="radio" name="payment" value="credit" class="hidden">
+                                <div class="p-3 border rounded-lg flex items-center hover:border-blue-500 transition-colors">
+                                    <i class="far fa-credit-card text-xl text-purple-600 mr-3"></i>
+                                    <span>Credit Card</span>
+                                </div>
+                            </label>
+                            <label class="payment-method-option">
+                                <input type="radio" name="payment" value="cod" class="hidden">
+                                <div class="p-3 border rounded-lg flex items-center hover:border-blue-500 transition-colors">
+                                    <i class="fas fa-money-bill-wave text-xl text-yellow-600 mr-3"></i>
+                                    <span>Cash on Delivery</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Shipping Address Section -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <h3 class="font-bold text-lg mb-3 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>
+                            Shipping Address
+                        </h3>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Province</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option>DKI Jakarta</option>
+                                        <option>Jawa Barat</option>
+                                        <option>Jawa Tengah</option>
+                                        <option>Jawa Timur</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                        <option>Jakarta Selatan</option>
+                                        <option>Jakarta Pusat</option>
+                                        <option>Jakarta Barat</option>
+                                        <option>Jakarta Utara</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Full Address</label>
+                                <textarea id="shippingAddress" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Street address, apartment, floor, etc."></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="12345">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                                    <input type="tel" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="+62 812 3456 7890">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Notes -->
+                    <div class="bg-gray-50 rounded-xl p-4">
+                        <h3 class="font-bold text-lg mb-3 flex items-center">
+                            <i class="fas fa-edit mr-2 text-blue-600"></i>
+                            Order Notes (Optional)
+                        </h3>
+                        <textarea id="orderNotes" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Special instructions, delivery preferences, etc."></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Checkout Footer -->
+            <div class="border-t p-4 bg-white">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-sm text-gray-600">Total Payment</p>
+                        <p class="text-xl font-bold text-blue-600" id="checkoutTotal">$0.00</p>
+                    </div>
+                    <div class="flex space-x-3">
+                        <button onclick="closeModal('checkoutModal')" class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-semibold">
+                            Cancel
+                        </button>
+                        <button onclick="processCheckout()" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center">
+                            <i class="fas fa-lock mr-2"></i> Confirm Order
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-2xl">
+            <!-- Content will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-check-circle"></i>
+            <span id="notificationText">Product added to cart successfully!</span>
+        </div>
+    </div>
+
+    <footer>
+        <!-- Newsletter -->
+        <div class="bg-gray-100 mt-12 py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold text-gray-900">Get Special Promos & Discounts</h2>
+                    <p class="mt-2 text-gray-600">Subscribe to our newsletter to get updates on new products and exclusive offers</p>
+                    <div class="mt-6 max-w-md mx-auto flex">
+                        <input type="email" placeholder="Your email address" class="flex-grow px-4 py-2 rounded-l-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button class="bg-blue-600 text-white px-6 py-2 rounded-r-full font-medium hover:bg-blue-700 transition duration-300">Subscribe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>  
+    <script src="hp.js"></script>
+</body>
+</html>

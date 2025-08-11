@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vegashop</title>
+    <link href="./output.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-section {
+            background-image: url('download (20).jfif');
+            background-size: cover;
+            background-position: center;
+            height: 400px;
+        }
+        .blur-bg {
+            backdrop-filter: blur(5px);
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .ed-banner {
+            background-image: url('download (17).jfif');
+            background-size: cover;
+            background-position: center;
+            height: 200px;
+            border-radius: 1rem;
+        }
+        .ad-banner {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        /* Custom scrollbar for register modal */
+        .modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #3b82f6 #f1f1f1;
+        }
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background-color: #3b82f6;
+            border-radius: 10px;
+        }
+        /* Password input wrapper */
+        .password-wrapper {
+            position: relative;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #9CA3AF;
+        }
+        .toggle-password:hover {
+            color: #4B5563;
+        }
+        /* Form validation */
+        .error-message {
+            color: #EF4444;
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+        .input-error {
+            border-color: #EF4444 !important;
+        }
+        /* Product image container */
+        .product-image-container {
+            position: relative;
+            padding-bottom: 75%; /* 4:3 aspect ratio */
+            height: 0;
+            overflow: hidden;
+        }
+        .product-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-2">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center">
+                        <span class="font-semibold text-blue-600 text-2xl">Vega<span class="text-gray-900">Shop</span></span>
+                    </a>
+                </div>
+                
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-xl mx-4">
+                    <div class="relative">
+                        <input type="text" id="search-input" class="bg-gray-100 h-10 px-5 pr-10 rounded-full text-sm focus:outline-none w-full" placeholder="Search products...">
+                        <button type="submit" class="absolute right-0 top-0 mt-2 mr-4 text-gray-500">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Right side items -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <a href="#" id="login-btn" class="py-2 px-4 text-gray-700 font-medium hover:text-blue-600 transition duration-300">Login</a>
+                    <a href="#" id="register-btn" class="py-2 px-4 bg-blue-600 text-white font-medium rounded-full hover:bg-blue-700 transition duration-300">Register</a>
+                    <a href="#" id="cart-btn" class="py-2 px-2 text-gray-700 relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    </a>
+                </div>
+                
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button class="outline-none mobile-menu-button">
+                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor">
+                            <path d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero-section relative text-blue-600">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+                    Easy & Secure Online Shopping
+                </h1>
+                <p class="mt-6 max-w-lg mx-auto text-xl">
+                    Discover thousands of quality products at the best prices only at VegaShop
+                </p>
+                <div class="mt-10">
+                    <a href="#" class="inline-block bg-white text-blue-600 py-3 px-8 rounded-full font-medium hover:bg-gray-100 transition duration-300">
+                        Start Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Banner 1 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="ed-banner p-6 text-white">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-2xl font-bold">50% OFF TODAY ONLY!</h3>
+                    <p class="mt-2">Special discount for electronics with coupon: MEGA50</p>
+                </div>
+                <button class="bg-white text-purple-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
+                    Claim Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">Popular Categories</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 justify-items-center">
+            <div class="bg-white rounded-lg shadow p-4 text-center hover:shadow-md transition duration-300 cursor-pointer w-full max-w-[150px]">
+                <div class="bg-blue-100 rounded-full p-3 inline-block">
+                    <i class="fas fa-mobile-alt text-blue-600 text-2xl"></i>
+                </div>
+                <p class="mt-2 font-medium">Mobile</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 text-center hover:shadow-md transition duration-300 cursor-pointer w-full max-w-[150px]">
+                <div class="bg-green-100 rounded-full p-3 inline-block">
+                    <i class="fas fa-headphones text-green-600 text-2xl"></i>
+                </div>
+                <p class="mt-2 font-medium">Audio</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 text-center hover:shadow-md transition duration-300 cursor-pointer w-full max-w-[150px]">
+                <div class="bg-yellow-100 rounded-full p-3 inline-block">
+                    <i class="fas fa-tv text-yellow-600 text-2xl"></i>
+                </div>
+                <p class="mt-2 font-medium">TV</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-4 text-center hover:shadow-md transition duration-300 cursor-pointer w-full max-w-[150px]">
+                <div class="bg-red-100 rounded-full p-3 inline-block">
+                    <i class="fas fa-laptop text-red-600 text-2xl"></i>
+                </div>
+                <p class="mt-2 font-medium">Laptop</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Banner 2 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="bg-gradient-to-r from-orange-500 to-pink-500 rounded-xl p-6 text-white ad-banner">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-2xl font-bold">FREE SHIPPING!</h3>
+                    <p class="mt-2">Minimum purchase of $10 nationwide</p>
+                </div>
+                <button class="bg-white text-orange-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
+                    Terms & Conditions
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">New Products</h2>
+            <a href="#" class="text-blue-600 font-medium hover:underline">View All</a>
+        </div>
+        <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Products will be loaded here from API -->
+        </div>
+    </div>
+
+    <!-- Ad Banner 3 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="bg-gradient-to-r from-green-500 to-teal-500 rounded-xl p-6 text-white ad-banner">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-2xl font-bold">20% CASHBACK!</h3>
+                    <p class="mt-2">Special discount when paying with VegaPay</p>
+                </div>
+                <button class="bg-white text-green-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
+                    <a href="homepage.html">Register</a>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">What Our Customers Say</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center mb-4">
+                    <div class="bg-gray-200 rounded-full w-12 h-12 flex items-center justify-center">
+                        <i class="fas fa-user text-gray-500"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="font-semibold">John Smith</h4>
+                        <div class="flex text-yellow-400 mt-1">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600">"The item arrived quickly and matched the description. Packaging was very neat. Thank you VegaShop!"</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center mb-4">
+                    <div class="bg-gray-200 rounded-full w-12 h-12 flex items-center justify-center">
+                        <i class="fas fa-user text-gray-500"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="font-semibold">Sarah Johnson</h4>
+                        <div class="flex text-yellow-400 mt-1">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600">"Very competitive prices and frequent promotions. I've shopped here many times and always been satisfied."</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <div class="flex items-center mb-4">
+                    <div class="bg-gray-200 rounded-full w-12 h-12 flex items-center justify-center">
+                        <i class="fas fa-user text-gray-500"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="font-semibold">Michael Brown</h4>
+                        <div class="flex text-yellow-400 mt-1">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-gray-600">"Customer service was very responsive in helping when there was an issue with my order. Highly recommended!"</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Banner 4 -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+        <div class="bg-gradient-to-r from-red-500 to-yellow-500 rounded-xl p-6 text-white ad-banner">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-2xl font-bold">FLASH SALE!</h3>
+                    <p class="mt-2">Up to 70% off today only!</p>
+                    <div class="mt-2 flex items-center">
+                        <span class="font-bold mr-2">Ends in:</span>
+                        <span class="bg-white text-red-500 px-2 py-1 rounded font-bold">12:34:56</span>
+                    </div>
+                </div>
+                <button class="bg-white text-red-600 px-6 py-2 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
+                    Shop Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Newsletter -->
+    <div class="bg-gray-100 mt-12 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold text-gray-900">Get Special Promos & Discounts</h2>
+                <p class="mt-2 text-gray-600">Subscribe to our newsletter to get updates on new products and exclusive offers</p>
+                <div class="mt-6 max-w-md mx-auto flex">
+                    <input type="email" placeholder="Your email address" class="flex-grow px-4 py-2 rounded-l-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button class="bg-blue-600 text-white px-6 py-2 rounded-r-full font-medium hover:bg-blue-700 transition duration-300">Subscribe</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-12 pb-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">VegaShop</h3>
+                    <p class="text-gray-400">Trusted online shopping platform with millions of quality products at the best prices.</p>
+                    <div class="flex mt-4 space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Help</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">How to Buy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Shipping</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Returns</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Payments</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">About Us</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About VegaShop</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms & Conditions</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">Contact Us</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center text-gray-400"><i class="fas fa-map-marker-alt mr-2"></i> 123 Main Street, Jakarta Barat</li>
+                        <li class="flex items-center text-gray-400"><i class="fas fa-phone-alt mr-2"></i> (123) 456-7890</li>
+                        <li class="flex items-center text-gray-400"><i class="fas fa-envelope mr-2"></i> support@vegashop.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-6 text-center text-gray-400">
+                <p>&copy; 2023 VegaShop. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+ <!-- Login Modal -->
+<div id="login-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity blur-bg" aria-hidden="true">
+            <div class="absolute inset-0 bg-black opacity-50"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 px-8 py-10">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <h3 class="text-3xl font-bold text-gray-800">Welcome Back</h3>
+                        <p class="text-gray-600 mt-1">Login to access your account</p>
+                    </div>
+                    <button id="close-login" class="text-gray-500 hover:text-gray-700 focus:outline-none transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form class="space-y-5" id="login-form">
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-envelope text-blue-500"></i>
+                            </div>
+                            <input type="email" id="login-email" class="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-3 border-gray-300 rounded-md bg-white transition-all" placeholder="you@example.com" required>
+                        </div>
+                        <p id="login-email-error" class="error-message hidden mt-1 text-sm text-red-600">Please enter a valid email address</p>
+                    </div>
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="login-password" class="block text-sm font-medium text-gray-700">Password</label>
+                        </div>
+                        <div class="password-wrapper relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-blue-500"></i>
+                            </div>
+                            <input type="password" id="login-password" class="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-10 py-3 border-gray-300 rounded-md bg-white transition-all" placeholder="••••••••" required>
+                            <span class="toggle-password absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <p id="login-password-error" class="error-message hidden mt-1 text-sm text-red-600">Password is required</p>
+                    </div>
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="remember-me" class="ml-2 block text-sm text-gray-700">Remember me</label>
+                        <div class="ml-auto justify-self-end">
+                            <a href="#" class="text-xs font-medium text-blue-600 hover:text-blue-500">Forgot password?</a>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login
+                        </button>
+                    </div>
+                </form>
+                <div class="mt-6">
+                    <div class="relative">
+                        <div class="absolute inset-0 flex items-center">
+                            <div class="w-full border-t border-gray-300"></div>
+                        </div>
+                        <div class="relative flex justify-center text-sm">
+                            <span class="px-2 bg-transparent text-gray-500">Or continue with</span>
+                        </div>
+                    </div>
+                    <div class="mt-6 grid grid-cols-2 gap-3">
+                        <button type="button" class="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                            <i class="fab fa-google text-red-500 mr-2"></i>
+                            Google
+                        </button>
+                        <button type="button" class="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                            <i class="fab fa-facebook-f text-blue-600 mr-2"></i>
+                            Facebook
+                        </button>
+                    </div>
+                </div>
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-600">
+                        Don't have an account?
+                        <button id="switch-to-register" class="font-medium text-blue-600 hover:text-blue-500 ml-1 focus:outline-none">Register</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <!-- Register Modal -->
+<div id="register-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity blur-bg" aria-hidden="true">
+            <div class="absolute inset-0 bg-black opacity-50"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-md w-full">
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 px-8 py-10">
+                <div class="flex justify-between items-center mb-8">
+                    <div>
+                        <a href="homepage.html">Register</a>
+                        <p class="text-gray-600 mt-1">Join us to start shopping</p>
+                    </div>
+                    <button id="close-register" class="text-gray-500 hover:text-gray-700 focus:outline-none transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="modal-content">
+                    <form class="space-y-4" id="register-form">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="first-name" class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-user text-blue-500"></i>
+                                    </div>
+                                    <input type="text" id="first-name" class="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-3 border-gray-300 rounded-md bg-white transition-all" placeholder="John" required>
+                                </div>
+                                <p id="first-name-error" class="error-message hidden mt-1 text-sm text-red-600">First name is required</p>
+                            </div>
+                            <div>
+                                <label for="last-name" class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-user text-blue-500"></i>
+                                    </div>
+                                    <input type="text" id="last-name" class="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-3 border-gray-300 rounded-md bg-white transition-all" placeholder="Doe" required>
+                                </div>
+                                <p id="last-name-error" class="error-message hidden mt-1 text-sm text-red-600">Last name is required</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="register-email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                            <div class="relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-envelope text-blue-500"></i>
+                                </div>
+                                <input type="email" id="register-email" class="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-3 py-3 border-gray-300 rounded-md bg-white transition-all" placeholder="you@example.com" required>
+                            </div>
+                            <p id="register-email-error" class="error-message hidden mt-1 text-sm text-red-600">Please enter a valid email address</p>
+                        </div>
+                        <div>
+                            <label for="register-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <div class="password-wrapper relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-blue-500"></i>
+                                </div>
+                                <input type="password" id="register-password" class="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-10 py-3 border-gray-300 rounded-md bg-white transition-all" placeholder="••••••••" required>
+                                <span class="toggle-password absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                            </div>
+                            <p id="register-password-error" class="error-message hidden mt-1 text-sm text-red-600">Password must be at least 8 characters</p>
+                            <div class="mt-2 text-xs text-gray-500">
+                                <p class="flex items-center"><i class="fas fa-check-circle mr-1 text-green-500"></i> Minimum 8 characters</p>
+                                <p class="flex items-center"><i class="fas fa-check-circle mr-1 text-green-500"></i> At least one number</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                            <div class="password-wrapper relative rounded-md shadow-sm">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-lock text-blue-500"></i>
+                                </div>
+                                <input type="password" id="confirm-password" class="focus:ring-2 focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 pr-10 py-3 border-gray-300 rounded-md bg-white transition-all" placeholder="••••••••" required>
+                                <span class="toggle-password absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                            </div>
+                            <p id="confirm-password-error" class="error-message hidden mt-1 text-sm text-red-600">Passwords do not match</p>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="agree-terms" name="agree-terms" type="checkbox" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded" required>
+                            </div>
+                            <div class="ml-3 text-sm">
+                                <label for="agree-terms" class="font-medium text-gray-700">
+                                    I agree to the <a href="#" class="text-blue-600 hover:text-blue-500">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-500">Privacy Policy</a>
+                                </label>
+                            </div>
+                        </div>
+                        <p id="terms-error" class="error-message hidden mt-1 text-sm text-red-600">You must agree to the terms</p>
+                        <div>
+                            <button type="submit" class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300">
+                                <a href="homepage.html">Register</a>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="mt-6">
+                        <div class="relative">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div class="relative flex justify-center text-sm">
+                                <span class="px-2 bg-transparent text-gray-500">Or Register with</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 grid grid-cols-2 gap-3">
+                            <button type="button" class="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                <i class="fab fa-google text-red-500 mr-2"></i>
+                                Google
+                            </button>
+                            <button type="button" class="w-full inline-flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                                <i class="fab fa-facebook-f text-blue-600 mr-2"></i>
+                                Facebook
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-6 text-center">
+                        <p class="text-sm text-gray-600">
+                            Already have an account?
+                            <button id="switch-to-login" class="font-medium text-blue-600 hover:text-blue-500 ml-1 focus:outline-none">Login</button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+   <script src="lp.js"></script>
+</body>
+</html>
